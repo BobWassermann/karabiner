@@ -1,6 +1,6 @@
 import fs from "fs";
 import { KarabinerRules } from "./types";
-import { createHyperSubLayers, app, open } from "./utils";
+import { createHyperSubLayers, app } from "./utils";
 
 const rules: KarabinerRules[] = [
   // Define the Hyper key itself
@@ -25,48 +25,23 @@ const rules: KarabinerRules[] = [
         ],
         type: "basic",
       },
-      {
-        type: "basic",
-        description: "Disable CMD + Tab to force Hyper Key usage",
-        from: {
-          key_code: "tab",
-          modifiers: {
-            mandatory: ["left_command"],
-          },
-        },
-        to: [
-          {
-            key_code: "tab",
-          },
-        ],
-      },
     ],
   },
   ...createHyperSubLayers({
     // o = "Open" applications
     o: {
-      g: app("Google Chrome"),
-      c: app("Cron"),
+      a: app("Arc"),
+      c: app("Google Chrome"),
       v: app("Visual Studio Code"),
-      d: app("Discord"),
       s: app("Slack"),
-      e: app("Superhuman"),
-      n: app("Notion"),
-      t: app("Terminal"),
-      // Open todo list managed via *H*ypersonic
-      h: open(
-        "notion://notion.so/stellatehq/Max-Stoiber-CEO-90ea5326add5408f967278461f37c39b#29b31b030a5a4192b05f3883f7d47fe3"
-      ),
-      z: app("zoom.us"),
-      m: app("Muse"),
       f: app("Figma"),
-      r: app("Telegram"),
       // "i"Message
       i: app("Messages"),
-      p: app("Spotify"),
-      a: app("iA Presenter"),
-      w: open("https://web.whatsapp.com"),
-      l: open("Linear"),
+      n: app("Reflect"),
+      t: app("Microsoft Teams (work preview)"),
+      m: app("Messenger"),
+      e: app("Mimestream"),
+      1: app("1Password"),
     },
 
     // w = "Window" via rectangle.app
@@ -121,7 +96,7 @@ const rules: KarabinerRules[] = [
         to: [
           {
             key_code: "left_arrow",
-            modifiers: ["right_option", "right_command"],
+            modifiers: ["left_control", "left_option"],
           },
         ],
       },
@@ -130,7 +105,7 @@ const rules: KarabinerRules[] = [
         to: [
           {
             key_code: "right_arrow",
-            modifiers: ["right_option", "right_command"],
+            modifiers: ["left_control", "left_option"],
           },
         ],
       },
@@ -138,8 +113,8 @@ const rules: KarabinerRules[] = [
         description: "Window: Full Screen",
         to: [
           {
-            key_code: "f",
-            modifiers: ["right_option", "right_command"],
+            key_code: "return_or_enter",
+            modifiers: ["left_control", "left_option"],
           },
         ],
       },
@@ -202,6 +177,13 @@ const rules: KarabinerRules[] = [
 
     // s = "System"
     s: {
+      c: {
+        to: [
+          {
+            key_code: "caps_lock",
+          },
+        ],
+      },
       u: {
         to: [
           {
@@ -306,16 +288,16 @@ const rules: KarabinerRules[] = [
       },
     },
 
-    // c = Musi*c* which isn't "m" because we want it to be on the left hand
+    // c = capture via CleanShot X
     c: {
-      p: {
-        to: [{ key_code: "play_or_pause" }],
-      },
-      n: {
-        to: [{ key_code: "fastforward" }],
-      },
-      b: {
-        to: [{ key_code: "rewind" }],
+      v: {
+        description: "Window: Hide",
+        to: [
+          {
+            key_code: "h",
+            modifiers: ["right_command"],
+          },
+        ],
       },
     },
   }),
