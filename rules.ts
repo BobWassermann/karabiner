@@ -1,6 +1,6 @@
 import fs from "fs";
 import { KarabinerRules } from "./types";
-import { createHyperSubLayers, app } from "./utils";
+import { createHyperSubLayers, app, open, rectangle, shell } from "./utils";
 
 const rules: KarabinerRules[] = [
   // Define the Hyper key itself
@@ -11,11 +11,24 @@ const rules: KarabinerRules[] = [
         description: "Caps Lock -> Hyper Key",
         from: {
           key_code: "caps_lock",
+          modifiers: {
+            optional: ["any"],
+          },
         },
         to: [
           {
-            key_code: "left_shift",
-            modifiers: ["left_command", "left_control", "left_option"],
+            set_variable: {
+              name: "hyper",
+              value: 1,
+            },
+          },
+        ],
+        to_after_key_up: [
+          {
+            set_variable: {
+              name: "hyper",
+              value: 0,
+            },
           },
         ],
         to_if_alone: [
@@ -25,24 +38,65 @@ const rules: KarabinerRules[] = [
         ],
         type: "basic",
       },
+      //      {
+      //        type: "basic",
+      //        description: "Disable CMD + Tab to force Hyper Key usage",
+      //        from: {
+      //          key_code: "tab",
+      //          modifiers: {
+      //            mandatory: ["left_command"],
+      //          },
+      //        },
+      //        to: [
+      //          {
+      //            key_code: "tab",
+      //          },
+      //        ],
+      //      },
     ],
   },
   ...createHyperSubLayers({
+    spacebar: open(
+      "raycast://extensions/stellate/mxstbr-commands/create-notion-todo"
+    ),
+    // b = "B"rowse
+    b: {
+      x: open("https://x.com"),
+      y: open("https://news.ycombinator.com"),
+    },
     // o = "Open" applications
     o: {
-      a: app("Arc"),
-      c: app("Google Chrome"),
+      1: app("1Password"),
+      g: app("Google Chrome"),
+      c: app("Cursor"),
       v: app("Visual Studio Code"),
       s: app("Slack"),
-      f: app("Figma"),
+      e: app("Superhuman"),
+      n: app("Notion"),
+      // "M"arkdown (Obsidian.md)
+      m: app("Obsidian"),
+      f: app("Finder"),
+      r: app("Texts"),
       // "i"Message
       i: app("Messages"),
+      p: app("Spotify"),
       t: app("Microsoft Teams"),
-      // "m"arkdown
-      m: app("Obsidian"),
-      e: app("Mimestream"),
-      1: app("1Password"),
     },
+
+    // TODO: This doesn't quite work yet.
+    // l = "Layouts" via Raycast's custom window management
+    // l: {
+    //   // Coding layout
+    //   c: shell`
+    //     open -a "Visual Studio Code.app"
+    //     sleep 0.2
+    //     open -g "raycast://customWindowManagementCommand?position=topLeft&relativeWidth=0.5"
+
+    //     open -a "Terminal.app"
+    //     sleep 0.2
+    //     open -g "raycast://customWindowManagementCommand?position=topRight&relativeWidth=0.5"
+    //   `,
+    // },
 
     // w = "Window" via rectangle.app
     w: {
@@ -55,69 +109,13 @@ const rules: KarabinerRules[] = [
           },
         ],
       },
-      y: {
-        description: "Window: First Third",
-        to: [
-          {
-            key_code: "left_arrow",
-            modifiers: ["right_option", "right_control"],
-          },
-        ],
-      },
-      k: {
-        description: "Window: Top Half",
-        to: [
-          {
-            key_code: "up_arrow",
-            modifiers: ["right_option", "right_command"],
-          },
-        ],
-      },
-      j: {
-        description: "Window: Bottom Half",
-        to: [
-          {
-            key_code: "down_arrow",
-            modifiers: ["right_option", "right_command"],
-          },
-        ],
-      },
-      o: {
-        description: "Window: Last Third",
-        to: [
-          {
-            key_code: "right_arrow",
-            modifiers: ["right_option", "right_control"],
-          },
-        ],
-      },
-      h: {
-        description: "Window: Left Half",
-        to: [
-          {
-            key_code: "left_arrow",
-            modifiers: ["left_control", "left_option"],
-          },
-        ],
-      },
-      l: {
-        description: "Window: Right Half",
-        to: [
-          {
-            key_code: "right_arrow",
-            modifiers: ["left_control", "left_option"],
-          },
-        ],
-      },
-      f: {
-        description: "Window: Full Screen",
-        to: [
-          {
-            key_code: "return_or_enter",
-            modifiers: ["left_control", "left_option"],
-          },
-        ],
-      },
+      y: rectangle("previous-display"),
+      o: rectangle("next-display"),
+      k: rectangle("top-half"),
+      j: rectangle("bottom-half"),
+      h: rectangle("left-half"),
+      l: rectangle("right-half"),
+      f: rectangle("maximize"),
       u: {
         description: "Window: Previous Tab",
         to: [
@@ -177,13 +175,6 @@ const rules: KarabinerRules[] = [
 
     // s = "System"
     s: {
-      c: {
-        to: [
-          {
-            key_code: "caps_lock",
-          },
-        ],
-      },
       u: {
         to: [
           {
@@ -234,30 +225,16 @@ const rules: KarabinerRules[] = [
           },
         ],
       },
-      e: {
-        to: [
-          {
-            // Emoji picker
-            key_code: "spacebar",
-            modifiers: ["right_control", "right_command"],
-          },
-        ],
-      },
-      // Turn on Elgato KeyLight
-      y: {
-        to: [
-          {
-            shell_command: `curl -H 'Content-Type: application/json' --request PUT --data '{ "numberOfLights": 1, "lights": [ { "on": 1, "brightness": 100, "temperature": 215 } ] }' http://192.168.8.84:9123/elgato/lights`,
-          },
-        ],
-      },
-      h: {
-        to: [
-          {
-            shell_command: `curl -H 'Content-Type: application/json' --request PUT --data '{ "numberOfLights": 1, "lights": [ { "on": 0, "brightness": 100, "temperature": 215 } ] }' http://192.168.8.84:9123/elgato/lights`,
-          },
-        ],
-      },
+      e: open(
+        `raycast://extensions/thomas/elgato-key-light/toggle?launchType=background`
+      ),
+      // "D"o not disturb toggle
+      d: open(
+        `raycast://extensions/yakitrak/do-not-disturb/toggle?launchType=background`
+      ),
+      // "T"heme
+      t: open(`raycast://extensions/raycast/system/toggle-system-appearance`),
+      c: open("raycast://extensions/raycast/system/open-camera"),
     },
 
     // v = "moVe" which isn't "m" because we want it to be on the left hand
@@ -278,6 +255,7 @@ const rules: KarabinerRules[] = [
       // Magicmove via homerow.app
       m: {
         to: [{ key_code: "f", modifiers: ["right_control"] }],
+        // TODO: Trigger Vim Easymotion when VSCode is focused
       },
       // Scroll mode via homerow.app
       s: {
@@ -286,21 +264,75 @@ const rules: KarabinerRules[] = [
       d: {
         to: [{ key_code: "d", modifiers: ["right_shift", "right_command"] }],
       },
+      u: {
+        to: [{ key_code: "page_down" }],
+      },
+      i: {
+        to: [{ key_code: "page_up" }],
+      },
     },
 
-    // c = capture via CleanShot X
+    // c = Musi*c* which isn't "m" because we want it to be on the left hand
     c: {
-      v: {
-        description: "Window: Hide",
+      p: {
+        to: [{ key_code: "play_or_pause" }],
+      },
+      n: {
+        to: [{ key_code: "fastforward" }],
+      },
+      b: {
+        to: [{ key_code: "rewind" }],
+      },
+    },
+
+    // r = "Raycast"
+    r: {
+      c: open("raycast://extensions/thomas/color-picker/pick-color"),
+      n: open("raycast://script-commands/dismiss-notifications"),
+      l: open(
+        "raycast://extensions/stellate/mxstbr-commands/create-mxs-is-shortlink"
+      ),
+      e: open(
+        "raycast://extensions/raycast/emoji-symbols/search-emoji-symbols"
+      ),
+      p: open("raycast://extensions/raycast/raycast/confetti"),
+      a: open("raycast://extensions/raycast/raycast-ai/ai-chat"),
+      s: open("raycast://extensions/peduarte/silent-mention/index"),
+      h: open(
+        "raycast://extensions/raycast/clipboard-history/clipboard-history"
+      ),
+      1: open(
+        "raycast://extensions/VladCuciureanu/toothpick/connect-favorite-device-1"
+      ),
+      2: open(
+        "raycast://extensions/VladCuciureanu/toothpick/connect-favorite-device-2"
+      ),
+    },
+  }),
+  {
+    description: "Change Backspace to Spacebar when Minecraft is focused",
+    manipulators: [
+      {
+        type: "basic",
+        from: {
+          key_code: "delete_or_backspace",
+        },
         to: [
           {
-            key_code: "h",
-            modifiers: ["right_command"],
+            key_code: "spacebar",
+          },
+        ],
+        conditions: [
+          {
+            type: "frontmost_application_if",
+            file_paths: [
+              "^/Users/mxstbr/Library/Application Support/minecraft/runtime/java-runtime-gamma/mac-os-arm64/java-runtime-gamma/jre.bundle/Contents/Home/bin/java$",
+            ],
           },
         ],
       },
-    },
-  }),
+    ],
+  },
 ];
 
 fs.writeFileSync(
