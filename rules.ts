@@ -37,9 +37,9 @@ const rules: KarabinerRules[] = [
       f: app("Figma"),
       // "i"Message
       i: app("Messages"),
-      n: app("Reflect"),
-      t: app("Microsoft Teams (work preview)"),
-      m: app("Messenger"),
+      t: app("Microsoft Teams"),
+      // "m"arkdown
+      m: app("Obsidian"),
       e: app("Mimestream"),
       1: app("1Password"),
     },
